@@ -55,20 +55,27 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   $py = "$env:USERPROFILE\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
 }
 $urls = @(
-  "https://cdn.jsdelivr.net/gh/<你的用户名>/compass@v1.0.0/compass-install.py",
-  "https://raw.githubusercontent.com/<你的用户名>/compass/v1.0.0/compass-install.py",
-  "https://ghproxy.net/https://raw.githubusercontent.com/<你的用户名>/compass/v1.0.0/compass-install.py"
+  "https://cdn.jsdelivr.net/gh/Jan0M0/compass@v1.0.0/compass-install.py",
+  "https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py",
+  "https://ghproxy.net/https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py"
 )
+$expected = "ea88ec518c98ac84e6500c6515d41fcc4ad4a34757c9d354a8c15042579f3605"
 $out = Join-Path $env:TEMP "compass-install.py"
+$ok = $false
 foreach ($u in $urls) {
-  try {
-    Invoke-WebRequest -Uri $u -OutFile $out -UseBasicParsing -TimeoutSec 30
-    if ((Get-Item $out).Length -gt 50000) { break }
-  } catch {}
+  foreach ($attempt in 1..2) {
+    try {
+      Invoke-WebRequest -Uri $u -OutFile $out -UseBasicParsing -TimeoutSec 30
+      if ((Test-Path $out) -and (Get-Item $out).Length -eq 139890) {
+        $actual = (Get-FileHash $out -Algorithm SHA256).Hash.ToLower()
+        if ($actual -eq $expected) { $ok = $true; break }
+      }
+    } catch {}
+    Start-Sleep -Seconds 1
+  }
+  if ($ok) { break }
 }
-if (-not (Test-Path $out) -or (Get-Item $out).Length -lt 50000) {
-  throw "安装包下载失败，请检查网络后重试"
-}
+if (-not $ok) { throw "安装包下载或校验失败，请检查网络后重试" }
 & $py $out --handle $name
 
 3. 装完告诉我两件事：看板网址；是否需要重启 WorkBuddy。
