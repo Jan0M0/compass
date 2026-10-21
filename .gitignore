@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# local data — never commit
+compass.db
+compass.db-*
+config.json
+server.json
+handoffs/
+logs/
+*.log

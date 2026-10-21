@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>罗盘 · 探索</title>
+<style>
+  :root{
+    --ink:#141821; --sub:#5b6472; --line:#e6e9ef; --bg:#f6f7f9; --card:#fff;
+    --brand:#2f5cff; --warm:#0f9d6e; --amber:#e08a00; --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 64px}
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .brand{display:flex;gap:12px;align-items:center}
+  .mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#0f9d6e,#5fd3a8);
+    display:grid;place-items:center;color:#fff;font-size:20px;box-shadow:0 6px 16px rgba(15,157,110,.25)}
+  h1{font-size:22px;letter-spacing:.5px}
+  .who{color:var(--sub);font-size:13px;margin-top:2px}
+  .nav{display:flex;gap:8px}
+  .nav a{font-size:13px;color:var(--brand);text-decoration:none;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:6px 14px}
+  .nav a:hover{border-color:#c9d2e3}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .card.wide{grid-column:1 / -1}
+  h2{font-size:13px;letter-spacing:1.2px;color:var(--sub);font-weight:600;margin-bottom:12px}
+  .sub{font-size:12.5px;color:var(--sub)}
+
+  .meter{display:grid;grid-template-columns:64px 1fr 42px;gap:10px;align-items:center;margin-bottom:11px;font-size:13px}
+  .bar{height:9px;background:#eef1f6;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#0f9d6e,#5fd3a8)}
+  .meter .n{text-align:right;color:var(--sub);font-size:12px}
+
+  .fact{font-size:13.5px;color:#334;margin-bottom:6px}
+  .fact b{font-weight:600}
+  .pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:999px;background:#eef2ff;color:var(--brand);margin-left:6px}
+  .pill.warm{background:#e8f7f0;color:var(--warm)}
+  .pill.amber{background:#fff4e5;color:var(--amber)}
+
+  .row{padding:11px 0;border-bottom:1px dashed var(--line)}
+  .row:last-child{border-bottom:0}
+  .row b{font-size:14px}
+  .row p{font-size:12.5px;color:var(--sub);margin-top:2px}
+  .empty{font-size:13px;color:var(--sub);padding:4px 0}
+
+  .mission{background:#f7fbf9;border:1px solid #dff0e8;border-radius:12px;padding:13px 15px;margin-bottom:10px}
+  .mission b{font-size:14px}
+  .mission .why{font-size:12.5px;color:var(--sub);margin-top:3px}
+  .mission .how{font-size:12.5px;color:#334;margin-top:5px}
+  .mission .meta{font-size:11.5px;color:var(--sub);margin-top:6px}
+
+  .q{font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .q:last-child{border-bottom:0}
+  .q::before{content:"？ ";color:var(--amber);font-weight:700}
+  .bigq{font-size:19px;line-height:1.6;font-weight:600;color:#1c2a24;letter-spacing:.3px}
+
+  .talk{background:#fffaf0;border:1px solid #f3e3c3;border-radius:12px;padding:15px 17px;margin-top:4px}
+  .talk b{font-size:14px}
+  .talk p{font-size:12.5px;color:#5b5245;margin-top:5px}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#fff;border:1px solid #eadfc8;
+    padding:2px 6px;border-radius:5px;color:#5b4a2a}
+
+  footer{margin-top:22px;font-size:12.5px;color:var(--sub);text-align:center;line-height:1.9}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark">◇</div>
+      <div>
+        <h1>罗盘 · 探索</h1>
+        <div class="who" id="who"></div>
+      </div>
+    </div>
+    <div class="nav">
+      <a href="{{DASHBOARD_URL}}">← 找实习看板</a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card wide">
+      <h2>这周可以想一想</h2>
+      <div class="bigq" id="weekly"></div>
+      <div class="sub" style="margin-top:8px">不用回答给别人听，想到什么记下来就行。想不出来也没关系。</div>
+    </section>
+
+    <section class="card">
+      <h2>现在的你</h2>
+      <div id="facts"></div>
+      <div id="prefs"></div>
+    </section>
+
+    <section class="card">
+      <h2>认识自己的进度</h2>
+      <div id="meters"></div>
+      <div class="sub" style="margin-top:10px">目标只是参考，不是 KPI。写不出来就空着，不用凑。</div>
+    </section>
+
+    <section class="card wide">
+      <h2>下一步可以做的（挑一件，不用全做）</h2>
+      <div id="missions"></div>
+    </section>
+
+    <section class="card">
+      <h2>正在验证的方向</h2>
+      <div id="paths"></div>
+    </section>
+
+    <section class="card">
+      <h2>还没答案的问题</h2>
+      <div id="questions"></div>
+    </section>
+
+    <section class="card wide">
+      <h2>做过的实验</h2>
+      <div id="experiments"></div>
+    </section>
+
+    <section class="card wide">
+      <h2>如果不知道从哪开始</h2>
+      <div class="talk">
+        <b>跟别的 AI 聊过很多？可以把它整理成交接文档。</b>
+        <p>不用重新讲一遍。让 WorkBuddy 打印提示词，复制给那个 AI，再把输出导入进来。</p>
+        <p><code>python scripts/handoff.py --print</code></p>
+        <p style="margin-top:8px"><b>想做一次 20 分钟访谈？</b>用 <code>python scripts/handoff.py --print-interview</code>，让 AI 一次问一个问题，问完自动整理。</p>
+        <p style="margin-top:8px">不用一次想清楚一辈子。这周做一件小事就够了。</p>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Sapphire Jan 设计 · 数据只存在这台电脑上 · 探索不是考试，没有标准答案<br>
+    如果最近持续情绪低落、睡不着，先找学校心理中心或信任的人聊聊，这比职业规划重要。
+  </footer>
+</div>
+
+<script id="payload" type="application/json">/*__DATA__*/</script>
+<script>
+const D = JSON.parse(document.getElementById('payload').textContent);
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S = D.self || {}, E = D.explore || {}, P = D.profile || {};
+
+const who = [P.name, P.school, P.major, P.grade].filter(Boolean).join(' · ');
+$('#who').textContent = who || '还没填画像';
+$('#weekly').textContent = D.weekly_question || '最近有什么事，你做的时候会忘记看手机？';
+
+const f = S.facts || {};
+const facts = [
+  f.name ? `<div class="fact"><b>${esc(f.name)}</b>${f.age ? ` · ${esc(f.age)} 岁` : ''}</div>` : '',
+  (f.school || f.major || f.grade) ? `<div class="fact">${esc([f.school,f.major,f.grade].filter(Boolean).join(' · '))}</div>` : '',
+  f.city ? `<div class="fact">城市：${esc(f.city)}</div>` : '',
+  f.family_context ? `<div class="fact">家庭：${esc(f.family_context)}</div>` : '',
+  f.money_pressure ? `<div class="fact">经济压力：${esc(f.money_pressure)}</div>` : '',
+].filter(Boolean);
+$('#facts').innerHTML = facts.length ? facts.join('') : '<div class="empty">还没写。可以从「我叫什么、在哪、大几」开始，不用一次写全。</div>';
+
+const prefs = S.preferences && S.preferences.tone
+  ? `<div class="fact" style="margin-top:10px">希望被这样对待：${esc(S.preferences.tone)}</div>` : '';
+$('#prefs').innerHTML = prefs;
+
+const comp = D.completion || {};
+$('#meters').innerHTML = Object.entries(comp).map(([k,v]) => {
+  const pct = Math.min(100, Math.round(v[0] / v[1] * 100));
+  return `<div class="meter"><span>${esc(k)}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="n">${v[0]}/${v[1]}</span></div>`;
+}).join('');
+
+const missions = D.suggestions || [];
+$('#missions').innerHTML = missions.length ? missions.map(m => `
+  <div class="mission">
+    <b>${esc(m.title)}</b>
+    <div class="why">${esc(m.why)}</div>
+    <div class="how">怎么做：${esc(m.how)}</div>
+    <div class="meta">${esc(m.time)} · ${esc(m.cost)} · 做完告诉 WorkBuddy 结果</div>
+  </div>`).join('') : '<div class="empty">暂时没有建议。先随便做点什么，再回来。</div>';
+
+const paths = E.paths || [];
+$('#paths').innerHTML = paths.length ? paths.map(p => {
+  const label = {considering:'在考虑', testing:'在验证', ruled_out:'已排除'}[p.status] || '在考虑';
+  const cls = p.status === 'testing' ? 'warm' : p.status === 'ruled_out' ? 'amber' : '';
+  return `<div class="row"><b>${esc(p.name)}</b><span class="pill ${cls}">${label}</span>
+    <p>${esc(p.note || '')}</p></div>`;
+}).join('') : '<div class="empty">还没列出方向。先读 5 个不同岗位的 JD，再来写。</div>';
+
+const qs = S.questions || [];
+$('#questions').innerHTML = qs.length ? qs.map(x => `<div class="q">${esc(typeof x === 'string' ? x : x.q)}</div>`).join('')
+  : '<div class="empty">没有问题也是一种状态。等有了再写。</div>';
+
+const exps = (S.experiments || []).slice().reverse();
+$('#experiments').innerHTML = exps.length ? exps.map(x => `
+  <div class="row"><b>${esc(x.title)}</b>${x.energy ? `<span class="pill">${esc(x.energy)}能量</span>` : ''}
+    <p>${esc([x.date, x.result, x.learned].filter(Boolean).join(' · '))}</p></div>`).join('')
+  : '<div class="empty">还没做过实验。第一个实验不用大，3 小时就够。</div>';
+</script>
+</body>
+</html>
