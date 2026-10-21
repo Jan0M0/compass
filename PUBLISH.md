@@ -55,23 +55,24 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   $py = "$env:USERPROFILE\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
 }
 $urls = @(
+  "https://ghproxy.net/https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py",
   "https://cdn.jsdelivr.net/gh/Jan0M0/compass@v1.0.0/compass-install.py",
-  "https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py",
-  "https://ghproxy.net/https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py"
+  "https://raw.githubusercontent.com/Jan0M0/compass/v1.0.0/compass-install.py"
 )
 $expected = "ea88ec518c98ac84e6500c6515d41fcc4ad4a34757c9d354a8c15042579f3605"
 $out = Join-Path $env:TEMP "compass-install.py"
 $ok = $false
-foreach ($u in $urls) {
-  foreach ($attempt in 1..2) {
+foreach ($round in 1..2) {
+  foreach ($u in $urls) {
     try {
-      Invoke-WebRequest -Uri $u -OutFile $out -UseBasicParsing -TimeoutSec 30
+      Invoke-WebRequest -Uri $u -OutFile $out -UseBasicParsing -TimeoutSec 15
       if ((Test-Path $out) -and (Get-Item $out).Length -eq 139890) {
-        $actual = (Get-FileHash $out -Algorithm SHA256).Hash.ToLower()
-        if ($actual -eq $expected) { $ok = $true; break }
+        if ((Get-FileHash $out -Algorithm SHA256).Hash.ToLower() -eq $expected) {
+          $ok = $true
+          break
+        }
       }
     } catch {}
-    Start-Sleep -Seconds 1
   }
   if ($ok) { break }
 }
